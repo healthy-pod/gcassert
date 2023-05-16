@@ -1,4 +1,4 @@
-module github.com/jordanlewis/gcassert
+module github.com/healthy-pod/gcassert
 
 go 1.13
 

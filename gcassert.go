@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"go/types"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -143,6 +144,7 @@ func (v assertVisitor) Visit(node ast.Node) (w ast.Visitor) {
 // GCAssert searches through the packages at the input path and writes failures
 // to comply with //gcassert directives to the given io.Writer.
 func GCAssert(w io.Writer, useBazel bool, paths ...string) error {
+	log.Fatal("fail")
 	for _, path := range paths {
 		// Assert that all paths begin with './'
 		// This is needed for ensuring that packages.Load and parseDirectives work
@@ -164,6 +166,8 @@ func GCAssert(w io.Writer, useBazel bool, paths ...string) error {
 	if err != nil {
 		return err
 	}
+
+	log.Fatalf("%v", directiveMap)
 
 	// Next: invoke Go compiler with -m flags to get the compiler to print
 	// its optimization decisions.
