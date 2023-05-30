@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"go/types"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -164,6 +165,27 @@ func GCAssert(w io.Writer, useBazel bool, paths ...string) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("%v", pkgs)
+	log.Printf("%v\n", directiveMap)
+	var trimmedPaths []string
+	for _, path := range paths {
+		trimmedPaths = append(trimmedPaths, strings.TrimPrefix(path, "./"))
+	}
+	pkgs, err = packages.Load(&packages.Config{
+		Mode: packages.NeedName | packages.NeedFiles | packages.NeedSyntax | packages.NeedCompiledGoFiles |
+			packages.NeedTypesInfo | packages.NeedTypes,
+		Fset: fileSet,
+	}, trimmedPaths...)
+	log.Printf("%v", pkgs)
+	if err != nil {
+		return err
+	}
+	directiveMap, err = parseDirectives(pkgs, fileSet)
+	if err != nil {
+		return err
+	}
+	log.Printf("%v\n", directiveMap)
+	log.Fatal("finished")
 
 	// Next: invoke Go compiler with -m flags to get the compiler to print
 	// its optimization decisions.
