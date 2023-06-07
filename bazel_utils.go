@@ -12,13 +12,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // getBazelBuildCmd expects packages relative path from the workspace root
 // and returns the command to build the given packages using Bazel with
 // the right flags to get the compiler to print its optimization decisions.
 func getBazelBuildCmd(pkgs []string) *exec.Cmd {
-	args := make([]string, 0, len(pkgs)+1)
+	args := make([]string, 0, len(pkgs)+2)
 	args = append(args, "build")
 	for i := range pkgs {
 		if pkg := strings.TrimSpace(pkgs[i]); pkg != "" {
@@ -28,6 +29,7 @@ func getBazelBuildCmd(pkgs []string) *exec.Cmd {
 	args = append(
 		args,
 		"--@io_bazel_rules_go//go/config:gc_goopts=-m=2,-d=ssa/check_bce/debug=1",
+		fmt.Sprintf("--action_env=force_rebuild=%d", time.Now().Unix()),
 	)
 	return exec.Command("bazel", args...)
 }
